@@ -23,7 +23,7 @@ RUN node scripts/generate-env.js && npm run build
 FROM nginx:alpine
 
 # Copy built application
-COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
+COPY --from=builder /app/dist/habitsforgood/browser /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
