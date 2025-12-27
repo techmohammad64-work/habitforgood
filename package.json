@@ -1,0 +1,23 @@
+{
+    "name": "habitsforgood-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "prepare": "husky install",
+        "lint:all": "npm run lint --prefix backend && npm run lint --prefix frontend",
+        "build:all": "npm run build --prefix backend && npm run build --prefix frontend"
+    },
+    "devDependencies": {
+        "husky": "^8.0.0",
+        "lint-staged": "^12.0.0"
+    },
+    "lint-staged": {
+        "backend/src/**/*.ts": [
+            "npm run lint --prefix backend --",
+            "npm run build --prefix backend"
+        ],
+        "frontend/src/**/*.ts": [
+            "npm run lint --prefix frontend --"
+        ]
+    }
+}

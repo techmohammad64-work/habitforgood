@@ -4,14 +4,14 @@ import { ApiError } from './error.middleware';
 
 export interface AuthRequest extends Request {
     user?: {
-        id: string;
+        id: number;
         email: string;
         role: string;
     };
 }
 
 export interface JwtPayload {
-    id: string;
+    id: number;
     email: string;
     role: string;
 }

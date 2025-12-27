@@ -240,9 +240,11 @@ export class AuthController {
 
             const token = authHeader.split(' ')[1];
             const secret = process.env.JWT_SECRET || 'dev-secret-key';
-            const decoded = jwt.verify(token, secret) as { id: string };
+            const decoded = jwt.verify(token, secret) as any; // Cast to any first to avoid type issues with JwtPayload if needed, or import JwtPayload
+            // Actually, let's just use number for local cast to be safe if JwtPayload is not imported
+            const userId = (decoded as { id: number }).id;
 
-            const user = await this.userRepository.findOne({ where: { id: decoded.id } });
+            const user = await this.userRepository.findOne({ where: { id: userId } });
             if (!user) {
                 throw ApiError.unauthorized('Invalid token');
             }
@@ -273,7 +275,7 @@ export class AuthController {
                 role: user.role,
             },
             secret,
-            { expiresIn }
+            { expiresIn: expiresIn as jwt.SignOptions['expiresIn'] }
         );
     }
 }

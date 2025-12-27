@@ -95,7 +95,7 @@ export class CampaignController {
             const { id } = req.params;
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id },
+                where: { id: parseInt(id) },
                 relations: ['habits', 'admin', 'cause'],
             });
 
@@ -104,7 +104,7 @@ export class CampaignController {
             }
 
             const enrollmentCount = await this.enrollmentRepository.count({
-                where: { campaignId: id },
+                where: { campaignId: parseInt(id) },
             });
 
             const totalPoints = await this.pointsRepository
@@ -151,7 +151,7 @@ export class CampaignController {
             const leaderboard = await this.streakRepository
                 .createQueryBuilder('streak')
                 .leftJoinAndSelect('streak.student', 'student')
-                .where('streak.campaignId = :id', { id })
+                .where('streak.campaignId = :id', { id: parseInt(id) })
                 .orderBy('streak.currentStreak', 'DESC')
                 .take(10)
                 .getMany();
@@ -160,7 +160,7 @@ export class CampaignController {
                 rank: index + 1,
                 studentId: entry.studentId,
                 displayName: entry.student?.anonymousMode
-                    ? `Anonymous #${entry.studentId.slice(-4)}`
+                    ? `Anonymous #${entry.studentId.toString().slice(-4)}`
                     : entry.student?.displayName,
                 currentStreak: entry.currentStreak,
                 longestStreak: entry.longestStreak,
@@ -231,7 +231,7 @@ export class CampaignController {
 
             // Check campaign exists and is active
             const campaign = await this.campaignRepository.findOne({
-                where: { id },
+                where: { id: parseInt(id) },
             });
 
             if (!campaign) {
@@ -244,7 +244,7 @@ export class CampaignController {
 
             // Check if already enrolled
             const existingEnrollment = await this.enrollmentRepository.findOne({
-                where: { studentId: student.id, campaignId: id },
+                where: { studentId: student.id, campaignId: parseInt(id) },
             });
 
             if (existingEnrollment) {
@@ -263,14 +263,14 @@ export class CampaignController {
             // Create enrollment
             const enrollment = this.enrollmentRepository.create({
                 studentId: student.id,
-                campaignId: id,
+                campaignId: parseInt(id),
             });
             await this.enrollmentRepository.save(enrollment);
 
             // Initialize streak
             const streak = this.streakRepository.create({
                 studentId: student.id,
-                campaignId: id,
+                campaignId: parseInt(id),
                 currentStreak: 0,
                 longestStreak: 0,
             });
@@ -303,7 +303,7 @@ export class CampaignController {
             }
 
             const enrollment = await this.enrollmentRepository.findOne({
-                where: { studentId: student.id, campaignId: id },
+                where: { studentId: student.id, campaignId: parseInt(id) },
             });
 
             if (!enrollment) {
@@ -423,7 +423,7 @@ export class CampaignController {
             }
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id, adminId: admin.id },
+                where: { id: parseInt(id), adminId: admin.id },
             });
 
             if (!campaign) {
@@ -458,7 +458,7 @@ export class CampaignController {
             // Handle habits update
             if (habits && Array.isArray(habits)) {
                 // Get existing habits
-                const existingHabits = await this.habitRepository.find({ where: { campaignId: id } });
+                const existingHabits = await this.habitRepository.find({ where: { campaignId: parseInt(id) } });
                 const existingHabitIds = existingHabits.map(h => h.id);
                 const incomingHabitIds = habits.filter(h => h.id).map(h => h.id); // Assuming string/number ID
 
@@ -475,7 +475,7 @@ export class CampaignController {
                         });
                     } else {
                         const newHabit = this.habitRepository.create({
-                            campaignId: id,
+                            campaignId: parseInt(id),
                             name: hData.name,
                             description: hData.description,
                             icon: hData.icon || 'star',
@@ -518,7 +518,7 @@ export class CampaignController {
             }
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id, adminId: admin.id },
+                where: { id: parseInt(id), adminId: admin.id },
             });
 
             if (!campaign) {
@@ -555,7 +555,7 @@ export class CampaignController {
             }
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id, adminId: admin.id },
+                where: { id: parseInt(id), adminId: admin.id },
             });
 
             if (!campaign) {
@@ -592,7 +592,7 @@ export class CampaignController {
             }
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id, adminId: admin.id },
+                where: { id: parseInt(id), adminId: admin.id },
             });
 
             if (!campaign) {
@@ -601,7 +601,7 @@ export class CampaignController {
 
             // Check if has enrollments
             const enrollmentCount = await this.enrollmentRepository.count({
-                where: { campaignId: id },
+                where: { campaignId: parseInt(id) },
             });
 
             if (enrollmentCount > 0) {
@@ -637,7 +637,7 @@ export class CampaignController {
             }
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id, adminId: admin.id },
+                where: { id: parseInt(id), adminId: admin.id },
             });
 
             if (!campaign) {
@@ -645,11 +645,11 @@ export class CampaignController {
             }
 
             const habitCount = await this.habitRepository.count({
-                where: { campaignId: id },
+                where: { campaignId: parseInt(id) },
             });
 
             const habit = this.habitRepository.create({
-                campaignId: id,
+                campaignId: parseInt(id),
                 name,
                 description,
                 icon: icon || 'star',
@@ -685,7 +685,7 @@ export class CampaignController {
             }
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id, adminId: admin.id },
+                where: { id: parseInt(id), adminId: admin.id },
             });
 
             if (!campaign) {
@@ -693,7 +693,7 @@ export class CampaignController {
             }
 
             const habit = await this.habitRepository.findOne({
-                where: { id: habitId, campaignId: id },
+                where: { id: parseInt(habitId), campaignId: parseInt(id) },
             });
 
             if (!habit) {
@@ -733,7 +733,7 @@ export class CampaignController {
             }
 
             const campaign = await this.campaignRepository.findOne({
-                where: { id, adminId: admin.id },
+                where: { id: parseInt(id), adminId: admin.id },
             });
 
             if (!campaign) {
@@ -741,7 +741,7 @@ export class CampaignController {
             }
 
             const habit = await this.habitRepository.findOne({
-                where: { id: habitId, campaignId: id },
+                where: { id: parseInt(habitId), campaignId: parseInt(id) },
             });
 
             if (!habit) {

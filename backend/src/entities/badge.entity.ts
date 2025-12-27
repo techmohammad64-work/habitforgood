@@ -22,26 +22,26 @@ export type BadgeType =
 @Unique(['studentId', 'badgeType', 'campaignId'])
 export class Badge {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id!: string;
 
-    @Column({ type: 'uuid', name: 'student_id' })
-    studentId: string;
+    @Column({ type: 'integer', name: 'student_id' })
+    studentId!: number;
 
     @Column({ type: 'varchar', length: 50, name: 'badge_type' })
-    badgeType: BadgeType;
+    badgeType!: BadgeType;
 
-    @Column({ type: 'uuid', nullable: true, name: 'campaign_id' })
-    campaignId: string;
+    @Column({ type: 'integer', nullable: true, name: 'campaign_id' })
+    campaignId!: number;
 
     @CreateDateColumn({ name: 'earned_at' })
-    earnedAt: Date;
+    earnedAt!: Date;
 
     // Relations
     @ManyToOne(() => Student, (student) => student.badges)
     @JoinColumn({ name: 'student_id' })
-    student: Student;
+    student!: Student;
 
     @ManyToOne(() => Campaign)
     @JoinColumn({ name: 'campaign_id' })
-    campaign: Campaign;
+    campaign!: Campaign;
 }

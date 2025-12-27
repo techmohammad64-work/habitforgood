@@ -11,31 +11,31 @@ import { User } from './user.entity';
 @Entity('notifications')
 export class Notification {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({ name: 'user_id' })
-    userId: number;
+    userId!: number;
 
     @Column({ type: 'varchar', length: 50 })
-    type: string;
+    type!: string;
 
     @Column({ type: 'varchar', length: 255 })
-    title: string;
+    title!: string;
 
     @Column({ type: 'text', nullable: true })
-    content: string;
+    content!: string;
 
     @Column({ type: 'jsonb', nullable: true })
-    data: Record<string, unknown>;
+    data!: Record<string, unknown>;
 
     @Column({ type: 'boolean', default: false })
-    read: boolean;
+    read!: boolean;
 
     @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+    createdAt!: Date;
 
     // Relations
     @ManyToOne(() => User)
     @JoinColumn({ name: 'user_id' })
-    user: User;
+    user!: User;
 }

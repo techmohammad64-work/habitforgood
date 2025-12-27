@@ -16,25 +16,25 @@ export type UserRole = 'student' | 'admin' | 'sponsor' | 'cause';
 @Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({ type: 'varchar', length: 255, unique: true })
-    email: string;
+    email!: string;
 
     @Column({ type: 'varchar', length: 255, name: 'password_hash' })
-    passwordHash: string;
+    passwordHash!: string;
 
     @Column({ type: 'varchar', length: 20 })
-    role: UserRole;
+    role!: UserRole;
 
     @Column({ type: 'boolean', default: false, name: 'email_verified' })
-    emailVerified: boolean;
+    emailVerified!: boolean;
 
     @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+    createdAt!: Date;
 
     @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
+    updatedAt!: Date;
 
     // Relations
     @OneToOne(() => Student, (student) => student.user)

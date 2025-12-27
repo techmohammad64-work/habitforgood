@@ -339,7 +339,7 @@ export class DashboardController {
             });
 
             const campaignIds = campaignId
-                ? [campaignId as string]
+                ? [parseInt(campaignId as string)]
                 : adminCampaigns.map((c) => c.id);
 
             // Get enrollments for these campaigns

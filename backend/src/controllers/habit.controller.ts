@@ -35,7 +35,7 @@ export class HabitController {
 
             // Check enrollment
             const enrollment = await this.enrollmentRepository.findOne({
-                where: { studentId: student.id, campaignId },
+                where: { studentId: student.id, campaignId: parseInt(campaignId) },
             });
 
             if (!enrollment) {
@@ -44,7 +44,7 @@ export class HabitController {
 
             // Get campaign habits
             const habits = await this.habitRepository.find({
-                where: { campaignId },
+                where: { campaignId: parseInt(campaignId) },
                 order: { sortOrder: 'ASC' },
             });
 
@@ -55,14 +55,14 @@ export class HabitController {
             const todaySubmission = await this.submissionRepository.findOne({
                 where: {
                     studentId: student.id,
-                    campaignId,
+                    campaignId: parseInt(campaignId),
                     submissionDate: today,
                 },
             });
 
             // Get current streak
             const streak = await this.streakRepository.findOne({
-                where: { studentId: student.id, campaignId },
+                where: { studentId: student.id, campaignId: parseInt(campaignId) },
             });
 
             res.json({
@@ -101,7 +101,7 @@ export class HabitController {
 
             // Check enrollment
             const enrollment = await this.enrollmentRepository.findOne({
-                where: { studentId: student.id, campaignId },
+                where: { studentId: student.id, campaignId: parseInt(campaignId) },
             });
 
             if (!enrollment) {
@@ -116,7 +116,7 @@ export class HabitController {
             const existingSubmission = await this.submissionRepository.findOne({
                 where: {
                     studentId: student.id,
-                    campaignId,
+                    campaignId: parseInt(campaignId),
                     submissionDate: today,
                 },
             });
@@ -128,7 +128,7 @@ export class HabitController {
             // Create submission
             const submission = this.submissionRepository.create({
                 studentId: student.id,
-                campaignId,
+                campaignId: parseInt(campaignId),
                 submissionDate: today,
                 rating: rating || null,
             });
@@ -136,13 +136,13 @@ export class HabitController {
 
             // Update streak
             let streak = await this.streakRepository.findOne({
-                where: { studentId: student.id, campaignId },
+                where: { studentId: student.id, campaignId: parseInt(campaignId) },
             });
 
             if (!streak) {
                 streak = this.streakRepository.create({
                     studentId: student.id,
-                    campaignId,
+                    campaignId: parseInt(campaignId),
                     currentStreak: 0,
                     longestStreak: 0,
                 });
@@ -183,7 +183,7 @@ export class HabitController {
             // Create points ledger entry
             const pointsEntry = this.pointsRepository.create({
                 studentId: student.id,
-                campaignId,
+                campaignId: parseInt(campaignId),
                 submissionId: submission.id,
                 submissionDate: today,
                 basePoints,
@@ -233,13 +233,13 @@ export class HabitController {
             }
 
             const submissions = await this.submissionRepository.find({
-                where: { studentId: student.id, campaignId },
+                where: { studentId: student.id, campaignId: parseInt(campaignId) },
                 order: { submissionDate: 'DESC' },
                 take: parseInt(limit as string),
             });
 
             const points = await this.pointsRepository.find({
-                where: { studentId: student.id, campaignId },
+                where: { studentId: student.id, campaignId: parseInt(campaignId) },
                 order: { submissionDate: 'DESC' },
                 take: parseInt(limit as string),
             });
@@ -273,7 +273,7 @@ export class HabitController {
             }
 
             const streak = await this.streakRepository.findOne({
-                where: { studentId: student.id, campaignId },
+                where: { studentId: student.id, campaignId: parseInt(campaignId) },
             });
 
             // Get total points for campaign
@@ -281,7 +281,7 @@ export class HabitController {
                 .createQueryBuilder('points')
                 .select('SUM(points.totalPoints)', 'total')
                 .where('points.studentId = :studentId', { studentId: student.id })
-                .andWhere('points.campaignId = :campaignId', { campaignId })
+                .andWhere('points.campaignId = :campaignId', { campaignId: parseInt(campaignId) })
                 .getRawOne();
 
             res.json({

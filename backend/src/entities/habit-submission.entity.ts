@@ -16,29 +16,29 @@ export type SubmissionRating = 'great' | 'good' | 'okay' | 'hard';
 @Unique(['studentId', 'campaignId', 'submissionDate'])
 export class HabitSubmission {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({ name: 'student_id' })
-    studentId: number;
+    studentId!: number;
 
     @Column({ name: 'campaign_id' })
-    campaignId: number;
+    campaignId!: number;
 
     @Column({ type: 'date', name: 'submission_date' })
-    submissionDate: Date;
+    submissionDate!: Date;
 
     @Column({ type: 'varchar', length: 20, nullable: true })
-    rating: SubmissionRating;
+    rating!: SubmissionRating;
 
     @CreateDateColumn({ name: 'submitted_at' })
-    submittedAt: Date;
+    submittedAt!: Date;
 
     // Relations
     @ManyToOne(() => Student, (student) => student.submissions)
     @JoinColumn({ name: 'student_id' })
-    student: Student;
+    student!: Student;
 
     @ManyToOne(() => Campaign, (campaign) => campaign.submissions)
     @JoinColumn({ name: 'campaign_id' })
-    campaign: Campaign;
+    campaign!: Campaign;
 }
