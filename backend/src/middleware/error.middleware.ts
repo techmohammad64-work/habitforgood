@@ -15,8 +15,10 @@ export const errorMiddleware = (
     const message = err.message || 'Internal Server Error';
 
     // Log error for debugging
+    // eslint-disable-next-line no-console
     console.error(`[ERROR] ${statusCode} - ${message}`);
     if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
         console.error(err.stack);
     }
 

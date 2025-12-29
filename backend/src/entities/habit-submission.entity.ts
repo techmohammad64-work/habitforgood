@@ -30,6 +30,9 @@ export class HabitSubmission {
     @Column({ type: 'varchar', length: 20, nullable: true })
     rating!: SubmissionRating;
 
+    @Column({ type: 'boolean', default: true })
+    completed!: boolean;
+
     @CreateDateColumn({ name: 'submitted_at' })
     submittedAt!: Date;
 

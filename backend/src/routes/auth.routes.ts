@@ -16,4 +16,7 @@ router.post('/logout', authController.logout);
 // Token verification
 router.get('/verify', authController.verifyToken);
 
+// Email-based habit submission
+router.get('/email-submission/:token', authController.handleEmailSubmission);
+
 export default router;

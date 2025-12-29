@@ -131,6 +131,7 @@ export class HabitController {
                 campaignId: parseInt(campaignId),
                 submissionDate: today,
                 rating: rating || null,
+                completed: true
             });
             await this.submissionRepository.save(submission);
 

@@ -124,4 +124,8 @@ export class CampaignService {
     getActiveAd(campaignId: string): Observable<ApiResponse<{ sponsorName: string; message: string; adImageUrl: string } | null>> {
         return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/ad`);
     }
+
+    triggerCampaignEmails(campaignId: string): Observable<ApiResponse<any>> {
+        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/trigger-emails`, {});
+    }
 }

@@ -24,6 +24,7 @@ router.post('/', roleMiddleware('admin'), campaignController.createCampaign);
 router.put('/:id', roleMiddleware('admin'), campaignController.updateCampaign);
 router.post('/:id/pause', roleMiddleware('admin'), campaignController.pauseCampaign);
 router.post('/:id/resume', roleMiddleware('admin'), campaignController.resumeCampaign);
+router.post('/:id/trigger-emails', roleMiddleware('admin'), campaignController.triggerManualEmails);
 router.delete('/:id', roleMiddleware('admin'), campaignController.deleteCampaign);
 
 // Habit management for campaigns
