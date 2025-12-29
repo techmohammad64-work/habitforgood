@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
+import { CampaignService } from '@core/services/campaign.service';
+import { NotificationService } from '@core/services/notification.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -79,6 +81,14 @@ import { environment } from '@env/environment';
 
                   <div class="card-actions">
                     <a [routerLink]="['/campaigns', campaign.id]" class="btn btn-outline btn-sm">View</a>
+                    @if (campaign.status === 'active') {
+                      <button 
+                        (click)="triggerReminders(campaign.id)" 
+                        class="btn btn-primary btn-sm"
+                        [disabled]="triggeringId === campaign.id">
+                        {{ triggeringId === campaign.id ? 'Sending...' : 'Send Reminders' }}
+                      </button>
+                    }
                   </div>
                 </div>
               }
@@ -116,8 +126,13 @@ import { environment } from '@env/environment';
 export class AdminDashboardComponent implements OnInit {
   data: any = null;
   loading = true;
+  triggeringId: string | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private campaignService: CampaignService,
+    private notificationService: NotificationService
+  ) { }
 
   ngOnInit(): void {
     this.http.get<any>(`${environment.apiUrl}/dashboard/admin`).subscribe({
@@ -129,5 +144,25 @@ export class AdminDashboardComponent implements OnInit {
   getStatusClass(status: string): string {
     const classes: Record<string, string> = { active: 'badge-success', upcoming: 'badge-secondary', ended: 'badge-warning', paused: 'badge-warning' };
     return 'badge ' + (classes[status] || '');
+  }
+
+  triggerReminders(campaignId: string): void {
+    if (!confirm('Are you sure you want to send daily habit reminders to all enrolled students now?')) {
+      return;
+    }
+
+    this.triggeringId = campaignId;
+    this.campaignService.triggerCampaignEmails(campaignId).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.notificationService.success('Reminders sent successfully!');
+        }
+        this.triggeringId = null;
+      },
+      error: (err) => {
+        this.notificationService.error(err.error?.message || 'Failed to send reminders');
+        this.triggeringId = null;
+      }
+    });
   }
 }

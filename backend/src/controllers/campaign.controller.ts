@@ -10,6 +10,7 @@ import { Student } from '../entities/student.entity';
 import { SponsorPledge } from '../entities/sponsor-pledge.entity';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { ApiError } from '../middleware/error.middleware';
+import { SchedulerService } from '../services/scheduler.service';
 
 export class CampaignController {
     private campaignRepository = AppDataSource.getRepository(Campaign);
@@ -460,7 +461,6 @@ export class CampaignController {
                 // Get existing habits
                 const existingHabits = await this.habitRepository.find({ where: { campaignId: parseInt(id) } });
                 const existingHabitIds = existingHabits.map(h => h.id);
-                const incomingHabitIds = habits.filter(h => h.id).map(h => h.id); // Assuming string/number ID
 
                 // Update or Create
                 for (let i = 0; i < habits.length; i++) {
@@ -753,6 +753,63 @@ export class CampaignController {
             res.json({
                 success: true,
                 message: 'Habit deleted',
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    triggerManualEmails = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            const { id } = req.params;
+
+            if (!req.user) {
+                throw ApiError.unauthorized('Not authenticated');
+            }
+
+            const admin = await this.adminRepository.findOne({
+                where: { userId: req.user.id },
+            });
+
+            if (!admin) {
+                throw ApiError.notFound('Admin profile not found');
+            }
+
+            const campaign = await this.campaignRepository.findOne({
+                where: { id: parseInt(id), adminId: admin.id },
+            });
+
+            if (!campaign) {
+                throw ApiError.notFound('Campaign not found or not authorized');
+            }
+
+            const schedulerService = new SchedulerService();
+            const results = await schedulerService.sendCampaignNotifications(campaign.id);
+
+            if (results.total === 0) {
+                res.json({
+                    success: true,
+                    message: 'No students enrolled in this campaign to notify',
+                    data: results
+                });
+                return;
+            }
+
+            if (results.failed === results.total) {
+                res.status(500).json({
+                    success: false,
+                    message: 'Failed to send all reminder emails. Check server logs.',
+                    data: results
+                });
+                return;
+            }
+
+            res.json({
+                success: true,
+                message: results.failed > 0
+                    ? `Sent ${results.success} reminders, but ${results.failed} failed.`
+                    : `Successfully sent ${results.success} reminders.`,
+                data: results
             });
         } catch (error) {
             next(error);

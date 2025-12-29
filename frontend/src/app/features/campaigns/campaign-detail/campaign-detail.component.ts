@@ -5,6 +5,7 @@ import { CampaignService, Campaign } from '@core/services/campaign.service';
 import { AuthService } from '@core/services/auth.service';
 import { SponsorService } from '@core/services/sponsor.service';
 import { NotificationService } from '@core/services/notification.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-campaign-detail',
@@ -25,7 +26,7 @@ import { NotificationService } from '@core/services/notification.service';
       } @else {
         <!-- Header -->
         <header class="campaign-header">
-          <a routerLink="/campaigns" class="back-link">← Back to Campaigns</a>
+          <a (click)="goBack()" class="back-link" style="cursor: pointer;">← Back</a>
           <div class="header-content">
             <div class="header-badges">
               <span class="badge" [class]="getStatusBadgeClass(campaign.status)">
@@ -619,7 +620,8 @@ export class CampaignDetailComponent implements OnInit {
     public authService: AuthService,
     private fb: FormBuilder,
     private sponsorService: SponsorService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private location: Location
   ) {
     this.pledgeForm = this.fb.group({
       ratePerPoint: ['', [Validators.required, Validators.min(0.01)]],
@@ -627,6 +629,35 @@ export class CampaignDetailComponent implements OnInit {
       message: ['', [Validators.maxLength(200)]],
       adImageUrl: ['']
     });
+  }
+
+  goBack(): void {
+    const user = this.authService.currentUser();
+
+    // If we have history, just go back (best for most cases)
+    if (window.history.length > 2) { // 2 because the initial page is also in history
+      this.location.back();
+      return;
+    }
+
+    // Fallback based on role
+    if (user) {
+      switch (user.role) {
+        case 'admin':
+          this.router.navigate(['/admin/dashboard']);
+          break;
+        case 'student':
+          this.router.navigate(['/student/dashboard']);
+          break;
+        case 'sponsor':
+          this.router.navigate(['/sponsor/dashboard']);
+          break;
+        default:
+          this.router.navigate(['/campaigns']);
+      }
+    } else {
+      this.router.navigate(['/campaigns']);
+    }
   }
 
   ngOnInit(): void {

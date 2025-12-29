@@ -34,14 +34,12 @@ export class AuthService {
     constructor(
         private http: HttpClient,
         private router: Router
-    ) {
-        this.checkAuth();
-    }
+    ) { }
 
-    private checkAuth(): void {
+    checkAuth(): Observable<any> {
         const token = localStorage.getItem('token');
         if (token) {
-            this.http.get<AuthResponse>(`${this.apiUrl}/auth/verify`).pipe(
+            return this.http.get<AuthResponse>(`${this.apiUrl}/auth/verify`).pipe(
                 tap((response) => {
                     if (response.success) {
                         this.currentUser.set(response.data.user);
@@ -51,12 +49,12 @@ export class AuthService {
                 catchError(() => {
                     this.logout();
                     return of(null);
-                })
-            ).subscribe(() => {
-                this.isLoading.set(false);
-            });
+                }),
+                tap(() => this.isLoading.set(false))
+            );
         } else {
             this.isLoading.set(false);
+            return of(null);
         }
     }
 
