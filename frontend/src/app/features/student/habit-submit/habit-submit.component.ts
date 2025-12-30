@@ -27,8 +27,8 @@ type Rating = 'great' | 'good' | 'okay' | 'hard';
           <div class="points-earned card-elevated">
             <span class="points-label">Points Earned</span>
             <span class="points-value" data-test-id="points-earned">+{{ submissionResult?.points?.total || 10 }}</span>
-            @if (submissionResult?.points?.streakMultiplier && submissionResult.points.streakMultiplier > 1) {
-              <span class="multiplier-badge">🔥 {{ submissionResult.points.streakMultiplier }}x streak bonus!</span>
+            @if ((submissionResult?.points?.streakMultiplier || 0) > 1) {
+              <span class="multiplier-badge">🔥 {{ submissionResult?.points?.streakMultiplier }}x streak bonus!</span>
             }
           </div>
           

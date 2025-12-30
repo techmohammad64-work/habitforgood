@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { NotificationService } from '@core/services/notification.service';
-import { Campaign, ApiResponse } from '@core/services/campaign.service';
+import { Campaign, ApiResponse, CampaignService } from '@core/services/campaign.service';
 
 interface AdminDashboardData {
   admin: {
@@ -166,13 +166,13 @@ export class AdminDashboardComponent implements OnInit {
 
     this.triggeringId = campaignId;
     this.campaignService.triggerCampaignEmails(campaignId).subscribe({
-      next: (res) => {
+      next: (res: ApiResponse<{ total: number; success: number; failed: number }>) => {
         if (res.success) {
           this.notificationService.success('Reminders sent successfully!');
         }
         this.triggeringId = null;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.notificationService.error(err.error?.message || 'Failed to send reminders');
         this.triggeringId = null;
       }

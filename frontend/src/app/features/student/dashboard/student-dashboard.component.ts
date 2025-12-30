@@ -105,7 +105,7 @@ interface StudentDashboardData {
                 <div class="campaign-card card-elevated" [attr.data-test-id]="'enrolled-campaign-' + campaign.id">
                   <div class="campaign-header">
                     <h3>{{ campaign.title }}</h3>
-                    <span class="streak-badge" [class.active]="campaign.streak?.currentStreak > 0">
+                    <span class="streak-badge" [class.active]="(campaign.streak?.currentStreak || 0) > 0">
                       🔥 {{ campaign.streak?.currentStreak || 0 }}
                     </span>
                   </div>
