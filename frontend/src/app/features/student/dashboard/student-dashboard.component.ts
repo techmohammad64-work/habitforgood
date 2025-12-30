@@ -3,29 +3,35 @@ import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { AuthService } from '@core/services/auth.service';
+import { Campaign, ApiResponse } from '@core/services/campaign.service';
+
+interface Badge {
+  id: string;
+  badgeType: string;
+}
 
 interface StudentDashboardData {
-    student: {
-        id: string;
-        displayName: string;
-        age: number;
-        avatarUrl?: string;
-    };
-    enrolledCampaigns: any[];
-    totalPoints: number;
-    badges: any[];
-    stats: {
-        activeCampaigns: number;
-        longestStreak: number;
-        totalBadges: number;
-    };
+  student: {
+    id: string;
+    displayName: string;
+    age: number;
+    avatarUrl?: string;
+  };
+  enrolledCampaigns: (Campaign & { streak: { currentStreak: number } })[];
+  totalPoints: number;
+  badges: Badge[];
+  stats: {
+    activeCampaigns: number;
+    longestStreak: number;
+    totalBadges: number;
+  };
 }
 
 @Component({
-    selector: 'app-student-dashboard',
-    standalone: true,
-    imports: [RouterLink],
-    template: `
+  selector: 'app-student-dashboard',
+  standalone: true,
+  imports: [RouterLink],
+  template: `
     <div class="dashboard">
       @if (loading) {
         <div class="loading-state">
@@ -149,7 +155,7 @@ interface StudentDashboardData {
       }
     </div>
   `,
-    styles: [`
+  styles: [`
     .dashboard {
       max-width: var(--max-width-xl);
       margin: 0 auto;
@@ -387,64 +393,64 @@ interface StudentDashboardData {
   `],
 })
 export class StudentDashboardComponent implements OnInit {
-    data: StudentDashboardData | null = null;
-    loading = true;
+  data: StudentDashboardData | null = null;
+  loading = true;
 
-    constructor(private http: HttpClient, public authService: AuthService) { }
+  constructor(private http: HttpClient, public authService: AuthService) { }
 
-    ngOnInit(): void {
-        this.loadDashboard();
-    }
+  ngOnInit(): void {
+    this.loadDashboard();
+  }
 
-    loadDashboard(): void {
-        this.http.get<any>(`${environment.apiUrl}/dashboard/student`).subscribe({
-            next: (response) => {
-                if (response.success) {
-                    this.data = response.data;
-                }
-                this.loading = false;
-            },
-            error: () => {
-                this.loading = false;
-            },
-        });
-    }
+  loadDashboard(): void {
+    this.http.get<ApiResponse<StudentDashboardData>>(`${environment.apiUrl}/dashboard/student`).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.data = response.data;
+        }
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      },
+    });
+  }
 
-    getInitial(name: string): string {
-        return name ? name.charAt(0).toUpperCase() : '?';
-    }
+  getInitial(name: string): string {
+    return name ? name.charAt(0).toUpperCase() : '?';
+  }
 
-    getProgress(campaign: any): number {
-        // Calculate progress based on days elapsed vs total campaign days
-        if (!campaign.startDate || !campaign.endDate) return 0;
-        const start = new Date(campaign.startDate).getTime();
-        const end = new Date(campaign.endDate).getTime();
-        const now = Date.now();
-        const progress = ((now - start) / (end - start)) * 100;
-        return Math.min(100, Math.max(0, progress));
-    }
+  getProgress(campaign: Campaign): number {
+    // Calculate progress based on days elapsed vs total campaign days
+    if (!campaign.startDate || !campaign.endDate) return 0;
+    const start = new Date(campaign.startDate).getTime();
+    const end = new Date(campaign.endDate).getTime();
+    const now = Date.now();
+    const progress = ((now - start) / (end - start)) * 100;
+    return Math.min(100, Math.max(0, progress));
+  }
 
-    getBadgeIcon(type: string): string {
-        const icons: Record<string, string> = {
-            '7_day_streak': '🔥',
-            '30_day_streak': '🌟',
-            '100_day_streak': '💎',
-            'campaign_completer': '🏆',
-            'top_3_finisher': '🥇',
-            'generous_heart': '💝',
-        };
-        return icons[type] || '🏅';
-    }
+  getBadgeIcon(type: string): string {
+    const icons: Record<string, string> = {
+      '7_day_streak': '🔥',
+      '30_day_streak': '🌟',
+      '100_day_streak': '💎',
+      'campaign_completer': '🏆',
+      'top_3_finisher': '🥇',
+      'generous_heart': '💝',
+    };
+    return icons[type] || '🏅';
+  }
 
-    getBadgeName(type: string): string {
-        const names: Record<string, string> = {
-            '7_day_streak': '7-Day Streak',
-            '30_day_streak': '30-Day Streak',
-            '100_day_streak': '100-Day Streak',
-            'campaign_completer': 'Campaign Hero',
-            'top_3_finisher': 'Top 3 Finisher',
-            'generous_heart': 'Generous Heart',
-        };
-        return names[type] || type;
-    }
+  getBadgeName(type: string): string {
+    const names: Record<string, string> = {
+      '7_day_streak': '7-Day Streak',
+      '30_day_streak': '30-Day Streak',
+      '100_day_streak': '100-Day Streak',
+      'campaign_completer': 'Campaign Hero',
+      'top_3_finisher': 'Top 3 Finisher',
+      'generous_heart': 'Generous Heart',
+    };
+    return names[type] || type;
+  }
 }

@@ -2,8 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { CampaignService } from '@core/services/campaign.service';
 import { NotificationService } from '@core/services/notification.service';
+import { Campaign, ApiResponse } from '@core/services/campaign.service';
+
+interface AdminDashboardData {
+  admin: {
+    name: string;
+    organization?: string;
+  };
+  stats: {
+    totalCampaigns: number;
+    activeCampaigns: number;
+    totalEnrollments: number;
+  };
+  campaigns: Campaign[];
+}
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -124,7 +137,7 @@ import { NotificationService } from '@core/services/notification.service';
   `],
 })
 export class AdminDashboardComponent implements OnInit {
-  data: any = null;
+  data: AdminDashboardData | null = null;
   loading = true;
   triggeringId: string | null = null;
 
@@ -135,7 +148,7 @@ export class AdminDashboardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.http.get<any>(`${environment.apiUrl}/dashboard/admin`).subscribe({
+    this.http.get<ApiResponse<AdminDashboardData>>(`${environment.apiUrl}/dashboard/admin`).subscribe({
       next: (res) => { if (res.success) this.data = res.data; this.loading = false; },
       error: () => { this.loading = false; },
     });

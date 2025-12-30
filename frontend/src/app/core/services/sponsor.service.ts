@@ -25,7 +25,7 @@ export class SponsorService {
 
     constructor(private http: HttpClient) { }
 
-    createPledge(data: PledgeRequest): Observable<ApiResponse<any>> {
-        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/pledge`, data);
+    createPledge(data: PledgeRequest): Observable<ApiResponse<{ pledgeId: string }>> {
+        return this.http.post<ApiResponse<{ pledgeId: string }>>(`${this.apiUrl}/pledge`, data);
     }
 }

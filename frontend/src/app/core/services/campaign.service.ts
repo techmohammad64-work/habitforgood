@@ -42,6 +42,13 @@ export interface Habit {
     frequency: 'daily' | 'weekly';
 }
 
+export interface LeaderboardEntry {
+    displayName: string;
+    points: number;
+    rank: number;
+    currentStreak: number;
+}
+
 export interface ApiResponse<T> {
     success: boolean;
     data: T;
@@ -77,16 +84,16 @@ export class CampaignService {
         return this.http.get<ApiResponse<Campaign>>(`${this.apiUrl}/${id}`);
     }
 
-    getLeaderboard(campaignId: string): Observable<ApiResponse<any[]>> {
-        return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/${campaignId}/leaderboard`);
+    getLeaderboard(campaignId: string): Observable<ApiResponse<LeaderboardEntry[]>> {
+        return this.http.get<ApiResponse<LeaderboardEntry[]>>(`${this.apiUrl}/${campaignId}/leaderboard`);
     }
 
-    enrollInCampaign(campaignId: string): Observable<ApiResponse<any>> {
-        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/enroll`, {});
+    enrollInCampaign(campaignId: string): Observable<ApiResponse<{ enrollmentId: string }>> {
+        return this.http.post<ApiResponse<{ enrollmentId: string }>>(`${this.apiUrl}/${campaignId}/enroll`, {});
     }
 
-    unenrollFromCampaign(campaignId: string): Observable<ApiResponse<any>> {
-        return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/enroll`);
+    unenrollFromCampaign(campaignId: string): Observable<ApiResponse<void>> {
+        return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${campaignId}/enroll`);
     }
 
     createCampaign(data: Partial<Campaign> & { habits?: Partial<Habit>[] }): Observable<ApiResponse<Campaign>> {
@@ -122,10 +129,10 @@ export class CampaignService {
     }
 
     getActiveAd(campaignId: string): Observable<ApiResponse<{ sponsorName: string; message: string; adImageUrl: string } | null>> {
-        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/ad`);
+        return this.http.get<ApiResponse<{ sponsorName: string; message: string; adImageUrl: string } | null>>(`${this.apiUrl}/${campaignId}/ad`);
     }
 
-    triggerCampaignEmails(campaignId: string): Observable<ApiResponse<any>> {
-        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/trigger-emails`, {});
+    triggerCampaignEmails(campaignId: string): Observable<ApiResponse<{ total: number; success: number; failed: number }>> {
+        return this.http.post<ApiResponse<{ total: number; success: number; failed: number }>>(`${this.apiUrl}/${campaignId}/trigger-emails`, {});
     }
 }

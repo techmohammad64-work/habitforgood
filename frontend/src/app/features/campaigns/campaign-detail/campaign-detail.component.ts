@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CampaignService, Campaign } from '@core/services/campaign.service';
+import { CampaignService, Campaign, ApiResponse, LeaderboardEntry } from '@core/services/campaign.service';
 import { AuthService } from '@core/services/auth.service';
 import { SponsorService } from '@core/services/sponsor.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -26,7 +26,7 @@ import { Location } from '@angular/common';
       } @else {
         <!-- Header -->
         <header class="campaign-header">
-          <a (click)="goBack()" class="back-link" style="cursor: pointer;">← Back</a>
+          <button (click)="goBack()" class="back-link" aria-label="Go back">← Back</button>
           <div class="header-content">
             <div class="header-badges">
               <span class="badge" [class]="getStatusBadgeClass(campaign.status)">
@@ -287,13 +287,20 @@ import { Location } from '@angular/common';
     }
     
     .back-link {
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      color: var(--color-wolf);
+      cursor: pointer;
       display: inline-block;
       margin-bottom: var(--spacing-md);
-      color: var(--color-wolf);
-      
-      &:hover {
-        color: var(--color-primary);
-      }
+      transition: color var(--transition-fast);
+      text-decoration: none;
+    }
+    
+    .back-link:hover {
+      color: var(--color-primary);
     }
     
     .campaign-header {
@@ -606,7 +613,7 @@ import { Location } from '@angular/common';
 })
 export class CampaignDetailComponent implements OnInit {
   campaign: Campaign | null = null;
-  leaderboard: any[] = [];
+  leaderboard: LeaderboardEntry[] = [];
   loading = true;
   actionLoading = false;
   isEnrolled = false;
@@ -694,10 +701,9 @@ export class CampaignDetailComponent implements OnInit {
 
   loadCampaign(id: string): void {
     this.campaignService.getCampaignById(id).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.campaign = response.data;
-          // TODO: Check enrollment status
+      next: (res: ApiResponse<Campaign>) => {
+        if (res.success) {
+          this.campaign = res.data;
         }
         this.loading = false;
       },

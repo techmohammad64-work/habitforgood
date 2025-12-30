@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { HabitService } from '@core/services/habit.service';
-import { CampaignService } from '@core/services/campaign.service';
+import { HabitService, SubmitResponse } from '@core/services/habit.service';
+import { CampaignService, Habit } from '@core/services/campaign.service';
 
 type Rating = 'great' | 'good' | 'okay' | 'hard';
 
@@ -398,14 +398,14 @@ type Rating = 'great' | 'good' | 'okay' | 'hard';
 })
 export class HabitSubmitComponent implements OnInit {
   campaignId = '';
-  habits: any[] = [];
+  habits: Habit[] = [];
   loading = true;
   submitting = false;
   submitted = false;
   alreadySubmitted = false;
   currentStreak = 0;
   selectedRating: Rating | null = null;
-  submissionResult: any = null;
+  submissionResult: SubmitResponse | null = null;
   activeAd: { sponsorName: string; message: string; adImageUrl: string } | null = null;
 
   ratingOptions: { value: Rating; emoji: string; label: string }[] = [

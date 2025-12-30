@@ -17,7 +17,7 @@
             "npm run build --prefix backend"
         ],
         "frontend/src/**/*.ts": [
-            "npm run lint --prefix frontend --"
+            "./lint-frontend.sh"
         ]
     }
 }

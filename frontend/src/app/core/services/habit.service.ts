@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
+import { Habit } from './campaign.service';
 
 export interface HabitSubmission {
     id: string;
@@ -23,7 +24,7 @@ export interface PointsInfo {
 }
 
 export interface TodayHabitsResponse {
-    habits: any[];
+    habits: Habit[];
     submittedToday: boolean;
     submission?: HabitSubmission;
     streak: StreakInfo;
@@ -57,13 +58,13 @@ export class HabitService {
         return this.http.post<ApiResponse<SubmitResponse>>(`${this.apiUrl}/${campaignId}/submit`, { rating });
     }
 
-    getSubmissionHistory(campaignId: string, limit = 30): Observable<ApiResponse<any>> {
-        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/history`, {
+    getSubmissionHistory(campaignId: string, limit = 30): Observable<ApiResponse<HabitSubmission[]>> {
+        return this.http.get<ApiResponse<HabitSubmission[]>>(`${this.apiUrl}/${campaignId}/history`, {
             params: { limit: limit.toString() },
         });
     }
 
-    getStreak(campaignId: string): Observable<ApiResponse<any>> {
-        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${campaignId}/streak`);
+    getStreak(campaignId: string): Observable<ApiResponse<StreakInfo>> {
+        return this.http.get<ApiResponse<StreakInfo>>(`${this.apiUrl}/${campaignId}/streak`);
     }
 }

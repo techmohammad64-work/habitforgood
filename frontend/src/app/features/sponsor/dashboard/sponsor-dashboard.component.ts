@@ -3,6 +3,30 @@ import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { environment } from '@env/environment';
+import { ApiResponse } from '@core/services/campaign.service';
+
+interface SponsorDashboardData {
+  sponsor: {
+    name: string;
+    totalDonated: number;
+  };
+  stats: {
+    activePledges: number;
+    totalProjectedDonation: number;
+  };
+  pledges: {
+    id: string;
+    campaignId: string;
+    status: string;
+    ratePerPoint: number;
+    capAmount?: number;
+    totalCampaignPoints: number;
+    projectedAmount: number;
+    campaign: {
+      title: string;
+    };
+  }[];
+}
 
 @Component({
   selector: 'app-sponsor-dashboard',
@@ -110,13 +134,13 @@ import { environment } from '@env/environment';
   `],
 })
 export class SponsorDashboardComponent implements OnInit {
-  data: any = null;
+  data: SponsorDashboardData | null = null;
   loading = true;
 
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.http.get<any>(`${environment.apiUrl}/dashboard/sponsor`).subscribe({
+    this.http.get<ApiResponse<SponsorDashboardData>>(`${environment.apiUrl}/dashboard/sponsor`).subscribe({
       next: (res) => { if (res.success) this.data = res.data; this.loading = false; },
       error: () => { this.loading = false; },
     });

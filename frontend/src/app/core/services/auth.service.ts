@@ -15,9 +15,21 @@ export interface AuthResponse {
     data: {
         user: User;
         token: string;
-        student?: any;
-        admin?: any;
-        sponsor?: any;
+        student?: {
+            id: string;
+            displayName: string;
+            age: number;
+        };
+        admin?: {
+            id: string;
+            name: string;
+            organization?: string;
+        };
+        sponsor?: {
+            id: string;
+            name: string;
+            totalDonated: number;
+        };
     };
 }
 
@@ -36,7 +48,7 @@ export class AuthService {
         private router: Router
     ) { }
 
-    checkAuth(): Observable<any> {
+    checkAuth(): Observable<AuthResponse | null> {
         const token = localStorage.getItem('token');
         if (token) {
             return this.http.get<AuthResponse>(`${this.apiUrl}/auth/verify`).pipe(
