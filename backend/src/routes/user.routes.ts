@@ -11,5 +11,6 @@ router.use(authMiddleware);
 router.get('/me', userController.getCurrentUser);
 router.put('/me', userController.updateProfile);
 router.get('/me/profile', userController.getProfileDetails);
+router.patch('/me/preferences', userController.updatePreferences);
 
 export default router;

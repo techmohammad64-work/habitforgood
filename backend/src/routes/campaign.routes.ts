@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import { CampaignController } from '../controllers/campaign.controller';
-import { authMiddleware, roleMiddleware } from '../middleware/auth.middleware';
+import { authMiddleware, roleMiddleware, optionalAuthMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 const campaignController = new CampaignController();
 
-// Public routes
+// Public routes (with optional auth to check enrollment status)
 router.get('/', campaignController.getAllCampaigns);
 router.get('/featured', campaignController.getFeaturedCampaigns);
-router.get('/:id', campaignController.getCampaignById);
+router.get('/:id', optionalAuthMiddleware, campaignController.getCampaignById);
 router.get('/:id/leaderboard', campaignController.getLeaderboard);
 
 // Protected routes

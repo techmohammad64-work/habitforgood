@@ -59,3 +59,30 @@ export const roleMiddleware = (...allowedRoles: string[]) => {
         next();
     };
 };
+
+// Optional auth middleware - attaches user if token present, but doesn't fail if absent
+export const optionalAuthMiddleware = (
+    req: AuthRequest,
+    _res: Response,
+    next: NextFunction
+) => {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            // No token - just continue without user
+            return next();
+        }
+
+        const token = authHeader.split(' ')[1];
+        const secret = process.env.JWT_SECRET || 'dev-secret-key';
+
+        const decoded = jwt.verify(token, secret) as JwtPayload;
+        req.user = decoded;
+
+        next();
+    } catch (error) {
+        // Token invalid - continue without user (don't throw error)
+        next();
+    }
+};

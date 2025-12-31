@@ -1,0 +1,116 @@
+<div class="settings-container">
+  <div class="settings-header">
+    <h1>Settings</h1>
+    <div class="header-actions">
+      <a routerLink="/profile" class="btn btn-secondary">Back to Profile</a>
+    </div>
+  </div>
+
+  @if (loading && !profile) {
+    <div class="loading">
+      <div class="spinner">🔄</div>
+      <p>Loading settings...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="error-message">
+      <span class="error-icon">❌</span>
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="success-message">
+      <span class="success-icon">✅</span>
+      <p>{{ successMessage }}</p>
+    </div>
+  }
+
+  @if (profile && !loading) {
+    <div class="settings-content">
+      <div class="settings-section">
+        <h2>Account Information</h2>
+        <div class="info-card">
+          <div class="info-item">
+            <label>Email Address</label>
+            <p>{{ profile.user.email }}</p>
+          </div>
+          <div class="info-item">
+            <label>Account Type</label>
+            <p class="role-badge">{{ profile.user.role | titlecase }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Preferences</h2>
+        <div class="settings-form">
+          <div class="form-group">
+            <label for="timezone">Timezone</label>
+            <select 
+              id="timezone"
+              [(ngModel)]="preferences.timezone"
+              class="form-select"
+            >
+              @for (tz of timezones; track tz.value) {
+                <option [value]="tz.value">{{ tz.label }}</option>
+              }
+            </select>
+            <p class="form-help">Used for scheduling notifications and reminders</p>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox"
+                [(ngModel)]="preferences.emailNotificationsEnabled"
+                class="form-checkbox"
+              />
+              <span>Enable email notifications</span>
+            </label>
+            <p class="form-help">Receive daily reminders and updates via email</p>
+          </div>
+
+          <div class="form-actions">
+            <button 
+              class="btn btn-primary" 
+              (click)="saveSettings()"
+              [disabled]="loading"
+            >
+              {{ loading ? 'Saving...' : 'Save Settings' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Privacy & Security</h2>
+        <div class="info-card">
+          <div class="info-item">
+            <label>Password</label>
+            <p>••••••••</p>
+            <button class="btn btn-secondary btn-sm" disabled>Change Password</button>
+          </div>
+        </div>
+        <p class="section-note">
+          <strong>Note:</strong> Password change functionality will be available soon.
+        </p>
+      </div>
+
+      <div class="settings-section danger-zone">
+        <h2>Danger Zone</h2>
+        <div class="info-card danger">
+          <div class="info-item">
+            <label>Delete Account</label>
+            <p>Permanently delete your account and all associated data</p>
+            <button class="btn btn-danger btn-sm" disabled>Delete Account</button>
+          </div>
+        </div>
+        <p class="section-note">
+          <strong>Note:</strong> This action cannot be undone. Please contact support if you need assistance.
+        </p>
+      </div>
+    </div>
+  }
+</div>

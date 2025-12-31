@@ -69,6 +69,16 @@ export const routes: Routes = [
         ],
     },
     {
+        path: 'profile',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
+    },
+    {
+        path: 'settings',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/profile/settings.component').then(m => m.SettingsComponent),
+    },
+    {
         path: '**',
         redirectTo: '',
     },

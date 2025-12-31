@@ -150,4 +150,38 @@ export class UserController {
             next(error);
         }
     };
+
+    updatePreferences = async (req: AuthRequest, res: Response, next: NextFunction) => {
+        try {
+            if (!req.user) {
+                throw ApiError.unauthorized('Not authenticated');
+            }
+
+            const { timezone, emailNotificationsEnabled } = req.body;
+
+            const user = await this.userRepository.findOne({
+                where: { id: req.user.id }
+            });
+
+            if (!user) {
+                throw ApiError.notFound('User not found');
+            }
+
+            if (timezone !== undefined) user.timezone = timezone;
+            if (emailNotificationsEnabled !== undefined) user.emailNotificationsEnabled = emailNotificationsEnabled;
+
+            await this.userRepository.save(user);
+
+            res.json({
+                success: true,
+                message: 'Preferences updated successfully',
+                data: {
+                    timezone: user.timezone,
+                    emailNotificationsEnabled: user.emailNotificationsEnabled
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

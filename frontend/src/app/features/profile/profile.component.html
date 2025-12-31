@@ -1,0 +1,167 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>My Profile</h1>
+    <div class="header-actions">
+      <a routerLink="/settings" class="btn btn-secondary">Settings</a>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading">
+      <div class="spinner">🔄</div>
+      <p>Loading profile...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="error-message">
+      <span class="error-icon">❌</span>
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="success-message">
+      <span class="success-icon">✅</span>
+      <p>{{ successMessage }}</p>
+    </div>
+  }
+
+  @if (profile && !loading) {
+    <div class="profile-content">
+      <div class="profile-avatar-section">
+        <div class="avatar-large">
+          @if (profile.profile?.avatarUrl) {
+            <img [src]="profile.profile.avatarUrl" [alt]="getDisplayName()">
+          } @else {
+            <span class="avatar-initials">{{ getInitials() }}</span>
+          }
+        </div>
+        <h2>{{ getDisplayName() }}</h2>
+        <p class="role-badge">{{ profile.user.role | titlecase }}</p>
+      </div>
+
+      <div class="profile-details">
+        <div class="details-header">
+          <h3>Profile Information</h3>
+          @if (!editMode) {
+            <button class="btn btn-primary" (click)="toggleEditMode()">Edit Profile</button>
+          } @else {
+            <div class="edit-actions">
+              <button class="btn btn-secondary" (click)="toggleEditMode()">Cancel</button>
+              <button class="btn btn-primary" (click)="saveProfile()" [disabled]="loading">
+                {{ loading ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="details-grid">
+          <div class="detail-item">
+            <label>Email</label>
+            <p>{{ profile.user.email }}</p>
+          </div>
+
+          @if (profile.user.role === 'student') {
+            <div class="detail-item">
+              <label>Display Name</label>
+              @if (editMode) {
+                <input 
+                  type="text" 
+                  [(ngModel)]="formData.displayName" 
+                  class="form-input"
+                  placeholder="Enter display name"
+                />
+              } @else {
+                <p>{{ profile.profile?.displayName || 'Not set' }}</p>
+              }
+            </div>
+
+            <div class="detail-item">
+              <label>Age</label>
+              <p>{{ profile.profile?.age || 'Not set' }}</p>
+            </div>
+
+            <div class="detail-item">
+              <label>Parent Email</label>
+              <p>{{ profile.profile?.parentEmail || 'Not set' }}</p>
+            </div>
+
+            @if (editMode) {
+              <div class="detail-item full-width">
+                <label>Avatar URL</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="formData.avatarUrl" 
+                  class="form-input"
+                  placeholder="Enter avatar URL (optional)"
+                />
+              </div>
+            }
+          }
+
+          @if (profile.user.role === 'admin') {
+            <div class="detail-item">
+              <label>Name</label>
+              @if (editMode) {
+                <input 
+                  type="text" 
+                  [(ngModel)]="formData.displayName" 
+                  class="form-input"
+                  placeholder="Enter your name"
+                />
+              } @else {
+                <p>{{ profile.profile?.name || 'Not set' }}</p>
+              }
+            </div>
+
+            <div class="detail-item">
+              <label>Organization</label>
+              @if (editMode) {
+                <input 
+                  type="text" 
+                  [(ngModel)]="formData.organization" 
+                  class="form-input"
+                  placeholder="Enter organization name"
+                />
+              } @else {
+                <p>{{ profile.profile?.organization || 'Not set' }}</p>
+              }
+            </div>
+
+            <div class="detail-item">
+              <label>Role Title</label>
+              <p>{{ profile.profile?.roleTitle || 'Not set' }}</p>
+            </div>
+
+            <div class="detail-item">
+              <label>Verified</label>
+              <p>{{ profile.profile?.verified ? '✅ Yes' : '❌ No' }}</p>
+            </div>
+          }
+
+          @if (profile.user.role === 'sponsor') {
+            <div class="detail-item">
+              <label>Name</label>
+              @if (editMode) {
+                <input 
+                  type="text" 
+                  [(ngModel)]="formData.displayName" 
+                  class="form-input"
+                  placeholder="Enter your name"
+                />
+              } @else {
+                <p>{{ profile.profile?.name || 'Not set' }}</p>
+              }
+            </div>
+
+            <div class="detail-item">
+              <label>Sponsor Type</label>
+              <p>{{ profile.profile?.sponsorType || 'Not set' }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

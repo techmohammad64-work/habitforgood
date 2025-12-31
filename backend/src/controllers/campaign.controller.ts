@@ -8,9 +8,11 @@ import { PointsLedger } from '../entities/points-ledger.entity';
 import { Admin } from '../entities/admin.entity';
 import { Student } from '../entities/student.entity';
 import { SponsorPledge } from '../entities/sponsor-pledge.entity';
+import { User } from '../entities/user.entity';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { ApiError } from '../middleware/error.middleware';
 import { SchedulerService } from '../services/scheduler.service';
+import { EmailService } from '../services/email.service';
 
 export class CampaignController {
     private campaignRepository = AppDataSource.getRepository(Campaign);
@@ -21,6 +23,8 @@ export class CampaignController {
     private adminRepository = AppDataSource.getRepository(Admin);
     private studentRepository = AppDataSource.getRepository(Student);
     private pledgeRepository = AppDataSource.getRepository(SponsorPledge);
+    private userRepository = AppDataSource.getRepository(User);
+    private emailService = new EmailService();
 
     getAllCampaigns = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -91,7 +95,7 @@ export class CampaignController {
         }
     };
 
-    getCampaignById = async (req: Request, res: Response, next: NextFunction) => {
+    getCampaignById = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params;
 
@@ -131,13 +135,31 @@ export class CampaignController {
                 totalDonated: pledge.sponsor.totalDonated
             }));
 
+            // Check if current user is enrolled (if authenticated)
+            let isEnrolled = false;
+            if (req.user && req.user.role === 'student') {
+                const student = await this.studentRepository.findOne({
+                    where: { userId: req.user.id }
+                });
+                if (student) {
+                    const enrollment = await this.enrollmentRepository.findOne({
+                        where: { 
+                            studentId: student.id,
+                            campaignId: parseInt(id)
+                        }
+                    });
+                    isEnrolled = !!enrollment;
+                }
+            }
+
             res.json({
                 success: true,
                 data: {
                     ...campaign,
                     enrollmentCount,
                     totalPoints: parseInt(totalPoints?.total || '0'),
-                    sponsors
+                    sponsors,
+                    isEnrolled
                 },
             });
         } catch (error) {
@@ -268,14 +290,43 @@ export class CampaignController {
             });
             await this.enrollmentRepository.save(enrollment);
 
-            // Initialize streak
-            const streak = this.streakRepository.create({
-                studentId: student.id,
-                campaignId: parseInt(id),
-                currentStreak: 0,
-                longestStreak: 0,
+            // Initialize or reset streak
+            let streak = await this.streakRepository.findOne({
+                where: {
+                    studentId: student.id,
+                    campaignId: parseInt(id)
+                }
             });
-            await this.streakRepository.save(streak);
+
+            if (streak) {
+                // Streak already exists (user rejoining), reset it
+                streak.currentStreak = 0;
+                streak.longestStreak = 0;
+                streak.lastSubmissionDate = null;
+                await this.streakRepository.save(streak);
+            } else {
+                // Create new streak
+                streak = this.streakRepository.create({
+                    studentId: student.id,
+                    campaignId: parseInt(id),
+                    currentStreak: 0,
+                    longestStreak: 0,
+                });
+                await this.streakRepository.save(streak);
+            }
+
+            // Send enrollment confirmation email
+            const user = await this.userRepository.findOne({
+                where: { id: req.user.id }
+            });
+            if (user && user.emailNotificationsEnabled) {
+                try {
+                    await this.emailService.sendEnrollmentConfirmation(user, student, campaign.title);
+                } catch (error) {
+                    // Log but don't fail the enrollment
+                    console.error('Failed to send enrollment email:', error);
+                }
+            }
 
             res.status(201).json({
                 success: true,
@@ -311,7 +362,37 @@ export class CampaignController {
                 throw ApiError.notFound('Enrollment not found');
             }
 
+            // Get campaign info for email
+            const campaign = await this.campaignRepository.findOne({
+                where: { id: parseInt(id) }
+            });
+
+            // Delete enrollment
             await this.enrollmentRepository.remove(enrollment);
+
+            // Delete streak record
+            const streak = await this.streakRepository.findOne({
+                where: {
+                    studentId: student.id,
+                    campaignId: parseInt(id)
+                }
+            });
+            if (streak) {
+                await this.streakRepository.remove(streak);
+            }
+
+            // Send unenrollment confirmation email
+            const user = await this.userRepository.findOne({
+                where: { id: req.user.id }
+            });
+            if (user && campaign && user.emailNotificationsEnabled) {
+                try {
+                    await this.emailService.sendUnenrollmentConfirmation(user, student, campaign.title);
+                } catch (error) {
+                    // Log but don't fail the unenrollment
+                    console.error('Failed to send unenrollment email:', error);
+                }
+            }
 
             res.json({
                 success: true,

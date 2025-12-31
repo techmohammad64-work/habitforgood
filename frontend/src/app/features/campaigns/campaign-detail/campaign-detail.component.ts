@@ -704,6 +704,8 @@ export class CampaignDetailComponent implements OnInit {
       next: (res: ApiResponse<Campaign>) => {
         if (res.success) {
           this.campaign = res.data;
+          // Set enrollment status from API response
+          this.isEnrolled = (res.data as any).isEnrolled || false;
         }
         this.loading = false;
       },

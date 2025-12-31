@@ -30,6 +30,12 @@ export class User {
     @Column({ type: 'boolean', default: false, name: 'email_verified' })
     emailVerified!: boolean;
 
+    @Column({ type: 'varchar', length: 50, default: 'UTC' })
+    timezone!: string;
+
+    @Column({ type: 'boolean', default: true, name: 'email_notifications_enabled' })
+    emailNotificationsEnabled!: boolean;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt!: Date;
 

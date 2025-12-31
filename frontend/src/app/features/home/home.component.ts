@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CampaignService, Campaign } from '@core/services/campaign.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -20,12 +21,21 @@ import { CampaignService, Campaign } from '@core/services/campaign.service';
             Kids earn points by completing daily habits. Sponsors donate to causes based on those points. Everyone wins! 🎉
           </p>
           <div class="hero-actions">
-            <a routerLink="/register" class="btn btn-primary btn-lg" data-test-id="hero-cta-button">
-              Start Your Journey
-            </a>
-            <a routerLink="/campaigns" class="btn btn-outline btn-lg" data-test-id="hero-browse-button">
-              Browse Campaigns
-            </a>
+            @if (authService.isAuthenticated()) {
+              <a [routerLink]="getDashboardRoute()" class="btn btn-primary btn-lg" data-test-id="hero-cta-button">
+                Go to My Dashboard
+              </a>
+              <a routerLink="/campaigns" class="btn btn-outline btn-lg" data-test-id="hero-browse-button">
+                Browse Campaigns
+              </a>
+            } @else {
+              <a routerLink="/register" class="btn btn-primary btn-lg" data-test-id="hero-cta-button">
+                Start Your Journey
+              </a>
+              <a routerLink="/campaigns" class="btn btn-outline btn-lg" data-test-id="hero-browse-button">
+                Browse Campaigns
+              </a>
+            }
           </div>
         </div>
         <div class="hero-illustration">
@@ -340,9 +350,21 @@ import { CampaignService, Campaign } from '@core/services/campaign.service';
 export class HomeComponent {
   campaigns: Campaign[] = [];
   loading = true;
+  authService = inject(AuthService);
+  private router = inject(Router);
 
   constructor(private campaignService: CampaignService) {
     this.loadFeaturedCampaigns();
+  }
+
+  getDashboardRoute(): string {
+    const role = this.authService.currentUser()?.role;
+    switch (role) {
+      case 'student': return '/student/dashboard';
+      case 'admin': return '/admin/dashboard';
+      case 'sponsor': return '/sponsor/dashboard';
+      default: return '/campaigns';
+    }
   }
 
   loadFeaturedCampaigns(): void {

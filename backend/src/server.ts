@@ -9,9 +9,12 @@ import { AppDataSource } from './config/database';
 import routes from './routes';
 import { errorMiddleware } from './middleware/error.middleware';
 import { SchedulerService } from './services/scheduler.service';
+import { emailWorker } from './workers/email.worker';
 
 const app = express();
 const schedulerService = new SchedulerService();
+// Worker is initialized on import
+console.log('👷 Email Worker initialized');
 const PORT = process.env.PORT || 3000;
 
 // Middleware

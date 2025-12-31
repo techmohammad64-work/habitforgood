@@ -13,6 +13,7 @@ import { PointsLedger } from '../entities/points-ledger.entity';
 import { SponsorPledge } from '../entities/sponsor-pledge.entity';
 import { Badge } from '../entities/badge.entity';
 import { Notification } from '../entities/notification.entity';
+import { NotificationLog } from '../entities/notification-log.entity';
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
@@ -38,6 +39,7 @@ export const AppDataSource = new DataSource({
         SponsorPledge,
         Badge,
         Notification,
+        NotificationLog,
     ],
     migrations: ['src/migrations/*.ts'],
     subscribers: [],

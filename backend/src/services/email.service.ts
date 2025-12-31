@@ -8,13 +8,13 @@ export class EmailService {
     private transporter: nodemailer.Transporter;
 
     constructor() {
-        // Use Ethereal for development or real SMTP for production
+        // Use SMTP settings from environment
         this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+            host: process.env.SMTP_HOST,
             port: parseInt(process.env.SMTP_PORT || '587'),
             auth: {
-                user: process.env.SMTP_USER || 'ethereal.user@ethereal.email',
-                pass: process.env.SMTP_PASS || 'ethereal.pass',
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
             },
         });
     }
@@ -56,16 +56,7 @@ export class EmailService {
             <p>You don't need to log in to submit your update.</p>
         `;
 
-        // Check if SMTP is likely the default (not configured)
-        const isMock = !process.env.SMTP_HOST || process.env.SMTP_HOST === 'smtp.ethereal.email';
-
         try {
-            if (isMock && process.env.NODE_ENV === 'development') {
-                // eslint-disable-next-line no-console
-                console.log(`[EMAIL MOCK] To: ${user.email} | Subject: Your daily habit check-in!`);
-                return true;
-            }
-
             await this.transporter.sendMail({
                 from: '"Habits for Good" <noreply@habitsforgood.com>',
                 to: user.email,
@@ -83,5 +74,87 @@ export class EmailService {
     private generateEncouragingNote(_student: Student): string {
         // Simple logic for now, could be more complex
         return 'Keep going! You\'re doing great making positive changes every day.';
+    }
+
+    async sendEnrollmentConfirmation(
+        user: User,
+        student: Student,
+        campaignTitle: string
+    ): Promise<boolean> {
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #00a6e5;">Welcome to ${campaignTitle}! 🎉</h2>
+                <p>Hi ${student.displayName},</p>
+                <p>You've successfully joined the <strong>${campaignTitle}</strong> campaign!</p>
+                <p>Here's what happens next:</p>
+                <ul>
+                    <li>📅 Complete your daily habits</li>
+                    <li>⭐ Earn points for each habit completed</li>
+                    <li>🔥 Build streaks for bonus points</li>
+                    <li>💝 Your sponsors will donate based on your points</li>
+                </ul>
+                <p>You'll receive daily reminders to help you stay on track. Keep up the great work!</p>
+                <p style="margin-top: 30px;">
+                    <a href="${process.env.APP_URL || 'http://localhost:4200'}/campaigns" 
+                       style="background: #00a6e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                        View My Campaigns
+                    </a>
+                </p>
+                <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                    Questions? Reply to this email or visit our help center.
+                </p>
+            </div>
+        `;
+
+        try {
+            await this.transporter.sendMail({
+                from: '"Habits for Good" <noreply@habitsforgood.com>',
+                to: user.email,
+                subject: `Welcome to ${campaignTitle}! 🎉`,
+                html,
+            });
+            return true;
+        } catch (mailError: any) {
+            console.error(`❌ Enrollment email failed for ${user.email}:`, (mailError as Error).message);
+            return false;
+        }
+    }
+
+    async sendUnenrollmentConfirmation(
+        user: User,
+        student: Student,
+        campaignTitle: string
+    ): Promise<boolean> {
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #00a6e5;">You've left ${campaignTitle}</h2>
+                <p>Hi ${student.displayName},</p>
+                <p>You've successfully unenrolled from the <strong>${campaignTitle}</strong> campaign.</p>
+                <p>We're sad to see you go, but we understand that priorities change. Your progress and points from this campaign have been saved.</p>
+                <p>Want to make a difference again? You can always join other campaigns or come back to this one later!</p>
+                <p style="margin-top: 30px;">
+                    <a href="${process.env.APP_URL || 'http://localhost:4200'}/campaigns" 
+                       style="background: #00a6e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                        Browse Campaigns
+                    </a>
+                </p>
+                <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                    We hope to see you back soon! 💚
+                </p>
+            </div>
+        `;
+
+        try {
+            await this.transporter.sendMail({
+                from: '"Habits for Good" <noreply@habitsforgood.com>',
+                to: user.email,
+                subject: `You've left ${campaignTitle}`,
+                html,
+            });
+            return true;
+        } catch (mailError: any) {
+            console.error(`❌ Unenrollment email failed for ${user.email}:`, (mailError as Error).message);
+            return false;
+        }
     }
 }
