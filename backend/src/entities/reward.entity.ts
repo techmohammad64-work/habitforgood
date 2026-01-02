@@ -27,38 +27,38 @@ export enum RewardRarity {
 @Entity('rewards')
 export class Reward {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ManyToOne(() => Student, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'student_id' })
-  student: Student;
+  student!: Student;
 
   @Column({ name: 'student_id' })
-  studentId: string;
+  studentId!: string;
 
   @Column({
     type: 'enum',
     enum: RewardType,
   })
-  type: RewardType;
+  type!: RewardType;
 
   @Column({
     type: 'enum',
     enum: RewardRarity,
   })
-  rarity: RewardRarity;
+  rarity!: RewardRarity;
 
   @Column({ type: 'varchar', length: 255 })
-  name: string;
+  name!: string;
 
   @Column({ type: 'text' })
-  description: string;
+  description!: string;
 
   @Column({ name: 'xp_bonus', type: 'int', default: 0 })
-  xpBonus: number;
+  xpBonus!: number;
 
   @Column({ name: 'points_bonus', type: 'int', default: 0 })
-  pointsBonus: number;
+  pointsBonus!: number;
 
   @Column({ name: 'badge_id', type: 'uuid', nullable: true })
   badgeId?: string;
@@ -67,5 +67,5 @@ export class Reward {
   iconUrl?: string;
 
   @CreateDateColumn({ name: 'received_at' })
-  receivedAt: Date;
+  receivedAt!: Date;
 }

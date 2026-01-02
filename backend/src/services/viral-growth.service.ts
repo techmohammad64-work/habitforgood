@@ -52,7 +52,7 @@ export class ViralGrowthService {
    * Generate a unique referral code for a student
    */
   async generateReferralCode(studentId: string, maxUses: number = 10): Promise<string> {
-    const student = await this.studentRepo.findOne({ where: { id: studentId } });
+    const student = await this.studentRepo.findOne({ where: { id: parseInt(studentId, 10) } });
     if (!student) throw new Error('Student not found');
 
     // Generate unique code
@@ -98,8 +98,8 @@ export class ViralGrowthService {
     }
 
     // Award XP to both parties
-    const referrer = await this.studentRepo.findOne({ where: { id: referral.referrerId } });
-    const newStudent = await this.studentRepo.findOne({ where: { id: newStudentId } });
+    const referrer = await this.studentRepo.findOne({ where: { id: parseInt(referral.referrerId, 10) } });
+    const newStudent = await this.studentRepo.findOne({ where: { id: parseInt(newStudentId, 10) } });
 
     if (!referrer || !newStudent) {
       return { success: false, referrerReward: 0, referredReward: 0, message: 'User not found' };
@@ -119,7 +119,7 @@ export class ViralGrowthService {
       success: true,
       referrerReward: referral.rewards.referrerXP,
       referredReward: referral.rewards.referredXP,
-      message: `🎉 Welcome bonus: ${referral.rewards.referredReward} XP!`
+      message: `🎉 Welcome bonus: ${referral.rewards.referredXP} XP!`
     };
   }
 
@@ -127,7 +127,7 @@ export class ViralGrowthService {
    * Generate shareable card for rank-up
    */
   async generateRankUpCard(studentId: string): Promise<ShareableCard> {
-    const student = await this.studentRepo.findOne({ where: { id: studentId } });
+    const student = await this.studentRepo.findOne({ where: { id: parseInt(studentId, 10) } });
     if (!student) throw new Error('Student not found');
 
     return {
@@ -143,14 +143,14 @@ export class ViralGrowthService {
    * Generate shareable card for achievement
    */
   async generateAchievementCard(studentId: string, achievementName: string): Promise<ShareableCard> {
-    const student = await this.studentRepo.findOne({ where: { id: studentId } });
+    const student = await this.studentRepo.findOne({ where: { id: parseInt(studentId, 10) } });
     if (!student) throw new Error('Student not found');
 
     return {
       type: 'achievement',
       imageUrl: `/api/share/achievement-card/${studentId}/${encodeURIComponent(achievementName)}`,
       title: `${student.displayName} unlocked: ${achievementName}`,
-      description: `Join Habits for Good and level up!`,
+      description: 'Join Habits for Good and level up!',
       shareUrl: `${process.env.API_URL_PUBLIC}/share/achievement/${studentId}`
     };
   }
@@ -179,14 +179,14 @@ export class ViralGrowthService {
     return students.map((student, index) => ({
       rank: index + 1,
       student: {
-        id: student.id,
+        id: student.id.toString(),
         displayName: student.displayName,
         level: student.level || 1,
         rank: student.rank || 'E-Rank',
         xp: student.xp || 0
       },
       score: metric === 'xp' ? student.xp || 0 : student.level || 1,
-      change: 'same' // Would track this with historical data
+      change: 'same' as const // Would track this with historical data
     }));
   }
 
@@ -251,7 +251,7 @@ export class ViralGrowthService {
     console.log(`[Viral] Student ${studentId} shared ${type} on ${platform}`);
     
     // Award small XP bonus for sharing
-    const student = await this.studentRepo.findOne({ where: { id: studentId } });
+    const student = await this.studentRepo.findOne({ where: { id: parseInt(studentId, 10) } });
     if (student) {
       student.xp = (student.xp || 0) + 10; // +10 XP for sharing
       await this.studentRepo.save(student);
@@ -285,7 +285,7 @@ export class ViralGrowthService {
 
     const topReferrers = await Promise.all(
       topReferrerIds.map(async ([studentId, referrals]) => {
-        const student = await this.studentRepo.findOne({ where: { id: studentId } });
+        const student = await this.studentRepo.findOne({ where: { id: parseInt(studentId, 10) } });
         return {
           studentId,
           displayName: student?.displayName || 'Unknown',

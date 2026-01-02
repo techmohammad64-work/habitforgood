@@ -25,14 +25,14 @@ export enum PenaltyType {
 @Entity('penalty_quests')
 export class PenaltyQuest {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ManyToOne(() => Student, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'student_id' })
-  student: Student;
+  student!: Student;
 
   @Column({ name: 'student_id' })
-  studentId: string;
+  studentId!: string;
 
   @ManyToOne(() => Campaign, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'campaign_id' })
@@ -46,33 +46,33 @@ export class PenaltyQuest {
     enum: PenaltyType,
     default: PenaltyType.MISSED_DAILY_QUEST,
   })
-  type: PenaltyType;
+  type!: PenaltyType;
 
   @Column({ type: 'text' })
-  description: string;
+  description!: string;
 
   @Column({ name: 'penalty_task', type: 'text' })
-  penaltyTask: string;
+  penaltyTask!: string;
 
   @Column({ name: 'xp_penalty', type: 'int', default: 0 })
-  xpPenalty: number;
+  xpPenalty!: number;
 
   @Column({
     type: 'enum',
     enum: PenaltyStatus,
     default: PenaltyStatus.PENDING,
   })
-  status: PenaltyStatus;
+  status!: PenaltyStatus;
 
   @Column({ name: 'deadline', type: 'timestamp' })
-  deadline: Date;
+  deadline!: Date;
 
   @Column({ name: 'completed_at', type: 'timestamp', nullable: true })
   completedAt?: Date;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

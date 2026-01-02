@@ -6,6 +6,7 @@ import { Streak } from '../entities/streak.entity';
 import { PointsLedger } from '../entities/points-ledger.entity';
 import { Enrollment } from '../entities/enrollment.entity';
 import { Student } from '../entities/student.entity';
+import { Campaign } from '../entities/campaign.entity';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { ApiError } from '../middleware/error.middleware';
 // import { checkDailyQuests, checkQuestCompletion } from './quest.controller';
@@ -17,6 +18,7 @@ export class HabitController {
     private pointsRepository = AppDataSource.getRepository(PointsLedger);
     private enrollmentRepository = AppDataSource.getRepository(Enrollment);
     private studentRepository = AppDataSource.getRepository(Student);
+    private campaignRepository = AppDataSource.getRepository(Campaign);
 
     getTodayHabits = async (req: AuthRequest, res: Response, next: NextFunction) => {
         try {
@@ -109,6 +111,15 @@ export class HabitController {
                 throw ApiError.forbidden('Not enrolled in this campaign');
             }
 
+            // Get campaign for AI assessment
+            const campaign = await this.campaignRepository.findOne({
+                where: { id: parseInt(campaignId) },
+            });
+
+            if (!campaign) {
+                throw ApiError.notFound('Campaign not found');
+            }
+
             // Get today's date (midnight)
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -176,13 +187,11 @@ export class HabitController {
             streak.lastSubmissionDate = today;
             await this.streakRepository.save(streak);
 
-            // Calculate points using AI Assessment
-            const { XPAssessmentService } = await import('../services/xp-assessment.service');
-            const aiXP = XPAssessmentService.assessHabitSubmissionXP(habit, campaign);
-            
+            // Calculate base points (default to 10 if no campaign difficulty)
+            const basePoints = 10;
             const streakMultiplier = this.getStreakMultiplier(streak.currentStreak);
             const bonusMultiplier = 1.0; // TODO: Implement lottery
-            const totalPoints = Math.floor(aiXP * streakMultiplier * bonusMultiplier);
+            const totalPoints = Math.floor(basePoints * streakMultiplier * bonusMultiplier);
 
             // Update XP and Level
             student.xp = (student.xp || 0) + totalPoints;

@@ -20,36 +20,36 @@ export enum AchievementCategory {
 @Entity('achievements')
 export class Achievement {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ManyToOne(() => Student, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'student_id' })
-  student: Student;
+  student!: Student;
 
   @Column({ name: 'student_id' })
-  studentId: string;
+  studentId!: string;
 
   @Column({
     type: 'enum',
     enum: AchievementCategory,
   })
-  category: AchievementCategory;
+  category!: AchievementCategory;
 
   @Column({ type: 'varchar', length: 255 })
-  title: string;
+  title!: string;
 
   @Column({ type: 'text' })
-  description: string;
+  description!: string;
 
   @Column({ name: 'icon_url', type: 'varchar', nullable: true })
   iconUrl?: string;
 
   @Column({ name: 'xp_reward', type: 'int', default: 0 })
-  xpReward: number;
+  xpReward!: number;
 
   @Column({ name: 'points_reward', type: 'int', default: 0 })
-  pointsReward: number;
+  pointsReward!: number;
 
   @CreateDateColumn({ name: 'unlocked_at' })
-  unlockedAt: Date;
+  unlockedAt!: Date;
 }

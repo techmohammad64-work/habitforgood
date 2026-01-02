@@ -163,7 +163,7 @@ const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     checkCondition: async (student) => {
       const enrollmentRepo = AppDataSource.getRepository(Enrollment);
       const count = await enrollmentRepo.count({
-        where: { studentId: student.id.toString() },
+        where: { studentId: student.id },
       });
       return count >= 1;
     },
@@ -178,7 +178,7 @@ const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     checkCondition: async (student) => {
       const enrollmentRepo = AppDataSource.getRepository(Enrollment);
       const count = await enrollmentRepo.count({
-        where: { studentId: student.id.toString(), isActive: false },
+        where: { studentId: student.id },
       });
       return count >= 10;
     },

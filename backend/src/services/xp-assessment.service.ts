@@ -69,7 +69,7 @@ export class XPAssessmentService {
     const description = campaign.description?.toLowerCase() || '';
 
     for (const habit of habits) {
-      const habitText = `${habit.habitType} ${habit.description || ''}`.toLowerCase();
+      const habitText = `${habit.name} ${habit.description || ''}`.toLowerCase();
       
       // Physical effort keywords (higher score)
       const physicalKeywords = [

@@ -20,53 +20,53 @@ export enum QuestStatus {
 @Entity('daily_quests')
 export class DailyQuest {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ManyToOne(() => Student, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'student_id' })
-  student: Student;
+  student!: Student;
 
   @Column({ name: 'student_id' })
-  studentId: string;
+  studentId!: string;
 
   @ManyToOne(() => Campaign, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'campaign_id' })
-  campaign: Campaign;
+  campaign!: Campaign;
 
   @Column({ name: 'campaign_id' })
-  campaignId: string;
+  campaignId!: string;
 
   @Column({ name: 'quest_date', type: 'date' })
-  questDate: Date;
+  questDate!: Date;
 
   @Column({ name: 'total_habits', type: 'int' })
-  totalHabits: number;
+  totalHabits!: number;
 
   @Column({ name: 'completed_habits', type: 'int', default: 0 })
-  completedHabits: number;
+  completedHabits!: number;
 
   @Column({
     type: 'enum',
     enum: QuestStatus,
     default: QuestStatus.IN_PROGRESS,
   })
-  status: QuestStatus;
+  status!: QuestStatus;
 
   @Column({ name: 'bonus_xp', type: 'int', default: 0 })
-  bonusXp: number;
+  bonusXp!: number;
 
   @Column({ name: 'bonus_points', type: 'int', default: 0 })
-  bonusPoints: number;
+  bonusPoints!: number;
 
   @Column({ name: 'completed_at', type: 'timestamp', nullable: true })
   completedAt?: Date;
 
   @Column({ name: 'deadline', type: 'timestamp' })
-  deadline: Date;
+  deadline!: Date;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

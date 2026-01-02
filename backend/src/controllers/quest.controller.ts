@@ -139,6 +139,7 @@ export const checkDailyQuests = async (studentId: string) => {
   const enrollmentRepo = AppDataSource.getRepository(Enrollment);
   const habitRepo = AppDataSource.getRepository(Habit);
   
+  const studentIdNum = parseInt(studentId, 10);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
@@ -146,9 +147,9 @@ export const checkDailyQuests = async (studentId: string) => {
   const endOfDay = new Date(today);
   endOfDay.setHours(23, 59, 59, 999);
 
-  // Get active enrollments
+  // Get enrollments
   const enrollments = await enrollmentRepo.find({
-    where: { studentId, isActive: true },
+    where: { studentId: studentIdNum },
     relations: ['campaign'],
   });
 
@@ -157,7 +158,7 @@ export const checkDailyQuests = async (studentId: string) => {
     const existingQuest = await dailyQuestRepo.findOne({
       where: {
         studentId,
-        campaignId: enrollment.campaignId,
+        campaignId: enrollment.campaignId.toString(),
         questDate: Between(today, tomorrow),
       },
     });
@@ -171,7 +172,7 @@ export const checkDailyQuests = async (studentId: string) => {
       if (totalHabits > 0) {
         const quest = dailyQuestRepo.create({
           studentId,
-          campaignId: enrollment.campaignId,
+          campaignId: enrollment.campaignId.toString(),
           questDate: today,
           totalHabits,
           completedHabits: 0,
@@ -192,6 +193,9 @@ export const checkQuestCompletion = async (studentId: string, campaignId: string
   const dailyQuestRepo = AppDataSource.getRepository(DailyQuest);
   const habitSubmissionRepo = AppDataSource.getRepository(HabitSubmission);
   const studentRepo = AppDataSource.getRepository(Student);
+  
+  const studentIdNum = parseInt(studentId, 10);
+  const campaignIdNum = parseInt(campaignId, 10);
   
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -216,11 +220,10 @@ export const checkQuestCompletion = async (studentId: string, campaignId: string
 
   const completedCount = await habitSubmissionRepo.count({
     where: {
-      studentId,
+      studentId: studentIdNum,
       submittedAt: Between(startOfDay, endOfDay),
-      habit: { campaignId },
+      campaignId: campaignIdNum,
     },
-    relations: ['habit'],
   });
 
   quest.completedHabits = completedCount;

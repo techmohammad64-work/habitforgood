@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth.middleware';
+import { authMiddleware } from '../middleware/auth.middleware';
 // Temporarily disabled for debugging
 // import {
 //   getDailyQuests,

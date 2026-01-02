@@ -1,7 +1,7 @@
 // 🚀 Viral Growth & Social Routes
 
 import { Router } from 'express';
-import { authMiddleware as auth } from '../middleware/auth.middleware';
+import { authMiddleware as auth, AuthRequest } from '../middleware/auth.middleware';
 import { ViralGrowthService } from '../services/viral-growth.service';
 
 const router = Router();
@@ -11,9 +11,9 @@ const viralService = new ViralGrowthService();
  * Generate referral code
  * POST /api/viral/referral/generate
  */
-router.post('/referral/generate', auth, async (req, res) => {
+router.post('/referral/generate', auth, async (req: AuthRequest, res) => {
   try {
-    const studentId = req.user!.userId;
+    const studentId = req.user!.id.toString();
     const { maxUses = 10 } = req.body;
 
     const code = await viralService.generateReferralCode(studentId, maxUses);
@@ -35,9 +35,9 @@ router.post('/referral/generate', auth, async (req, res) => {
  * Apply referral code (called during signup)
  * POST /api/viral/referral/apply
  */
-router.post('/referral/apply', auth, async (req, res) => {
+router.post('/referral/apply', auth, async (req: AuthRequest, res) => {
   try {
-    const studentId = req.user!.userId;
+    const studentId = req.user!.id.toString();
     const { referralCode } = req.body;
 
     const result = await viralService.applyReferralCode(studentId, referralCode);
@@ -55,9 +55,9 @@ router.post('/referral/apply', auth, async (req, res) => {
  * Generate shareable rank-up card
  * GET /api/viral/share/rank-up
  */
-router.get('/share/rank-up', auth, async (req, res) => {
+router.get('/share/rank-up', auth, async (req: AuthRequest, res) => {
   try {
-    const studentId = req.user!.userId;
+    const studentId = req.user!.id.toString();
     const card = await viralService.generateRankUpCard(studentId);
 
     res.json({
@@ -73,9 +73,9 @@ router.get('/share/rank-up', auth, async (req, res) => {
  * Generate shareable achievement card
  * GET /api/viral/share/achievement/:name
  */
-router.get('/share/achievement/:name', auth, async (req, res) => {
+router.get('/share/achievement/:name', auth, async (req: AuthRequest, res) => {
   try {
-    const studentId = req.user!.userId;
+    const studentId = req.user!.id.toString();
     const { name } = req.params;
 
     const card = await viralService.generateAchievementCard(studentId, name);
@@ -117,9 +117,9 @@ router.get('/leaderboard', async (req, res) => {
  * Get student's leaderboard position
  * GET /api/viral/leaderboard/position?metric=xp
  */
-router.get('/leaderboard/position', auth, async (req, res) => {
+router.get('/leaderboard/position', auth, async (req: AuthRequest, res) => {
   try {
-    const studentId = req.user!.userId;
+    const studentId = req.user!.id.toString();
     const metric = (req.query.metric as 'xp' | 'level') || 'xp';
 
     const position = await viralService.getStudentLeaderboardPosition(studentId, metric);
@@ -137,9 +137,9 @@ router.get('/leaderboard/position', auth, async (req, res) => {
  * Track social share (awards XP bonus)
  * POST /api/viral/track-share
  */
-router.post('/track-share', auth, async (req, res) => {
+router.post('/track-share', auth, async (req: AuthRequest, res) => {
   try {
-    const studentId = req.user!.userId;
+    const studentId = req.user!.id.toString();
     const { type, platform } = req.body;
 
     await viralService.trackShare(studentId, type, platform);
@@ -160,7 +160,7 @@ router.post('/track-share', auth, async (req, res) => {
  * Generate share text for social media
  * POST /api/viral/share-text
  */
-router.post('/share-text', auth, async (req, res) => {
+router.post('/share-text', auth, async (req: AuthRequest, res) => {
   try {
     const { type, data } = req.body;
     const shareText = viralService.generateShareText(type, data);
@@ -185,7 +185,7 @@ router.post('/share-text', auth, async (req, res) => {
  * Get viral growth metrics (admin only)
  * GET /api/viral/metrics
  */
-router.get('/metrics', auth, async (req, res) => {
+router.get('/metrics', auth, async (req: AuthRequest, res) => {
   try {
     // Check if user is admin/super-admin
     if (req.user!.role !== 'admin' && req.user!.role !== 'super-admin') {
