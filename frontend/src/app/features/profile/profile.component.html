@@ -58,15 +58,16 @@
 
         <div class="details-grid">
           <div class="detail-item">
-            <label>Email</label>
-            <p>{{ profile.user.email }}</p>
+            <label for="email-display">Email</label>
+            <p id="email-display">{{ profile.user.email }}</p>
           </div>
 
           @if (profile.user.role === 'student') {
             <div class="detail-item">
-              <label>Display Name</label>
+              <label for="display-name">Display Name</label>
               @if (editMode) {
                 <input 
+                  id="display-name"
                   type="text" 
                   [(ngModel)]="formData.displayName" 
                   class="form-input"
@@ -78,19 +79,20 @@
             </div>
 
             <div class="detail-item">
-              <label>Age</label>
-              <p>{{ profile.profile?.age || 'Not set' }}</p>
+              <label for="age-display">Age</label>
+              <p id="age-display">{{ profile.profile?.age || 'Not set' }}</p>
             </div>
 
             <div class="detail-item">
-              <label>Parent Email</label>
-              <p>{{ profile.profile?.parentEmail || 'Not set' }}</p>
+              <label for="parent-email">Parent Email</label>
+              <p id="parent-email">{{ profile.profile?.parentEmail || 'Not set' }}</p>
             </div>
 
             @if (editMode) {
               <div class="detail-item full-width">
-                <label>Avatar URL</label>
+                <label for="avatar-url">Avatar URL</label>
                 <input 
+                  id="avatar-url"
                   type="text" 
                   [(ngModel)]="formData.avatarUrl" 
                   class="form-input"
@@ -102,9 +104,10 @@
 
           @if (profile.user.role === 'admin') {
             <div class="detail-item">
-              <label>Name</label>
+              <label for="admin-name">Name</label>
               @if (editMode) {
                 <input 
+                  id="admin-name"
                   type="text" 
                   [(ngModel)]="formData.displayName" 
                   class="form-input"
@@ -116,9 +119,10 @@
             </div>
 
             <div class="detail-item">
-              <label>Organization</label>
+              <label for="organization">Organization</label>
               @if (editMode) {
                 <input 
+                  id="organization"
                   type="text" 
                   [(ngModel)]="formData.organization" 
                   class="form-input"
@@ -130,21 +134,22 @@
             </div>
 
             <div class="detail-item">
-              <label>Role Title</label>
-              <p>{{ profile.profile?.roleTitle || 'Not set' }}</p>
+              <label for="role-title">Role Title</label>
+              <p id="role-title">{{ profile.profile?.roleTitle || 'Not set' }}</p>
             </div>
 
             <div class="detail-item">
-              <label>Verified</label>
-              <p>{{ profile.profile?.verified ? '✅ Yes' : '❌ No' }}</p>
+              <label for="verified-status">Verified</label>
+              <p id="verified-status">{{ profile.profile?.verified ? '✅ Yes' : '❌ No' }}</p>
             </div>
           }
 
           @if (profile.user.role === 'sponsor') {
             <div class="detail-item">
-              <label>Name</label>
+              <label for="sponsor-name">Name</label>
               @if (editMode) {
                 <input 
+                  id="sponsor-name"
                   type="text" 
                   [(ngModel)]="formData.displayName" 
                   class="form-input"
@@ -156,8 +161,8 @@
             </div>
 
             <div class="detail-item">
-              <label>Sponsor Type</label>
-              <p>{{ profile.profile?.sponsorType || 'Not set' }}</p>
+              <label for="sponsor-type">Sponsor Type</label>
+              <p id="sponsor-type">{{ profile.profile?.sponsorType || 'Not set' }}</p>
             </div>
           }
         </div>

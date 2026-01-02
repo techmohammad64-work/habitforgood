@@ -33,12 +33,12 @@
         <h2>Account Information</h2>
         <div class="info-card">
           <div class="info-item">
-            <label>Email Address</label>
-            <p>{{ profile.user.email }}</p>
+            <label for="email-info">Email Address</label>
+            <p id="email-info">{{ profile.user.email }}</p>
           </div>
           <div class="info-item">
-            <label>Account Type</label>
-            <p class="role-badge">{{ profile.user.role | titlecase }}</p>
+            <label for="account-type">Account Type</label>
+            <p id="account-type" class="role-badge">{{ profile.user.role | titlecase }}</p>
           </div>
         </div>
       </div>
@@ -63,6 +63,7 @@
           <div class="form-group">
             <label class="checkbox-label">
               <input 
+                id="email-notifications"
                 type="checkbox"
                 [(ngModel)]="preferences.emailNotificationsEnabled"
                 class="form-checkbox"
@@ -88,8 +89,8 @@
         <h2>Privacy & Security</h2>
         <div class="info-card">
           <div class="info-item">
-            <label>Password</label>
-            <p>••••••••</p>
+            <label for="password-info">Password</label>
+            <p id="password-info">••••••••</p>
             <button class="btn btn-secondary btn-sm" disabled>Change Password</button>
           </div>
         </div>
@@ -102,8 +103,8 @@
         <h2>Danger Zone</h2>
         <div class="info-card danger">
           <div class="info-item">
-            <label>Delete Account</label>
-            <p>Permanently delete your account and all associated data</p>
+            <label for="delete-account-info">Delete Account</label>
+            <p id="delete-account-info">Permanently delete your account and all associated data</p>
             <button class="btn btn-danger btn-sm" disabled>Delete Account</button>
           </div>
         </div>

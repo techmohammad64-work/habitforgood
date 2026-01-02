@@ -44,7 +44,13 @@ import { CommonModule } from '@angular/common';
                 </button>
                 
                 @if (userMenuOpen) {
-                  <div class="dropdown-backdrop" (click)="closeUserMenu()"></div>
+                  <div 
+                    class="dropdown-backdrop" 
+                    (click)="closeUserMenu()"
+                    (keydown.escape)="closeUserMenu()"
+                    role="presentation"
+                    tabindex="-1"
+                  ></div>
                   <div class="user-dropdown">
                     <a routerLink="/profile" class="dropdown-item" (click)="closeUserMenu()" data-test-id="dropdown-profile-link">
                       <span class="item-icon">👤</span>
